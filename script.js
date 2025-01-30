@@ -6,11 +6,11 @@ document.getElementById('calculate-gpa').addEventListener('click', () => {
   let totalCredits = 0;
 
   courses.forEach(course => {
-    const grade = parseFloat(course.querySelector('.grade').value);
+    const grade = course.querySelector('.grade').value;
     const credits = parseFloat(course.querySelector('.credits').value);
 
     if (!isNaN(credits) && credits >= 0) {
-      totalGradePoints += grade * credits;
+      totalGradePoints += parseFloat(grade) * credits;
       totalCredits += credits;
     }
   });
@@ -30,16 +30,17 @@ function addCourse() {
   newCourse.innerHTML = `
     <select class="grade">
       <option value="4.0">A+</option>
-      <option value="4.0">A</option>
+      <option value="3.9">A</option>
       <option value="3.7">A-</option>
-      <option value="3.3">B+</option>
-      <option value="3.0">B</option>
+      <option value="3.5">B+</option>
+      <option value="3.1">B</option>
       <option value="2.7">B-</option>
-      <option value="2.3">C+</option>
-      <option value="2.0">C</option>
-      <option value="1.7">C-</option>
-      <option value="1.3">D+</option>
-      <option value="1.0">D</option>
+      <option value="2.5">C+</option>
+      <option value="2.3">C</option>
+      <option value="2.0">C-</option>
+      <option value="1.8">D+</option>
+      <option value="1.6">D</option>
+      <option value="1.3">D-</option>
       <option value="0.0">F</option>
     </select>
     <select class="credits">
