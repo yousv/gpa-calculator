@@ -57,11 +57,9 @@ function addCourse(grade = '', credits = '') {
   `;
   coursesDiv.appendChild(newCourse);
 
-  // Set saved values
   if (grade) newCourse.querySelector('.grade').value = grade;
   if (credits) newCourse.querySelector('.credits').value = credits;
 
-  // Add event listeners
   newCourse.querySelector('.remove-course').addEventListener('click', () => {
     coursesDiv.removeChild(newCourse);
     saveData();
@@ -88,5 +86,4 @@ function loadData() {
   });
 }
 
-// Load saved data when the page loads
 window.addEventListener('load', loadData);
