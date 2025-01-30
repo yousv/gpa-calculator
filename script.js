@@ -9,7 +9,7 @@ document.getElementById('calculate-gpa').addEventListener('click', () => {
     const grade = course.querySelector('.grade').value;
     const credits = parseFloat(course.querySelector('.credits').value);
 
-    if (!isNaN(credits) && credits >= 0) {
+    if (!isNaN(credits) && credits >= 0 && grade) {
       totalGradePoints += parseFloat(grade) * credits;
       totalCredits += credits;
     }
@@ -28,7 +28,18 @@ function addCourse(grade = '', credits = '') {
   const newCourse = document.createElement('div');
   newCourse.className = 'course';
   newCourse.innerHTML = `
+    <select class="credits">
+      <option value="">Select Course</option>
+      <option value="4">Bacteriology (4)</option>
+      <option value="4">Biochemistry (4)</option>
+      <option value="2">Parasitology (2)</option>
+      <option value="2">Mechatronics (2)</option>
+      <option value="2">English (2)</option>
+      <option value="2">Histology (2)</option>
+      <option value="2">Foundation Technology (2)</option>
+    </select>
     <select class="grade">
+      <option value="">Select Grade</option>
       <option value="4.0">A+</option>
       <option value="3.8">A</option>
       <option value="3.6">A-</option>
@@ -41,16 +52,6 @@ function addCourse(grade = '', credits = '') {
       <option value="2.2">D+</option>
       <option value="2.0">D</option>
       <option value="0.0">F</option>
-    </select>
-    <select class="credits">
-      <option value="">Select Course</option>
-      <option value="4">Bacteriology (4)</option>
-      <option value="4">Biochemistry (4)</option>
-      <option value="2">Parasitology (2)</option>
-      <option value="2">Mechatronics (2)</option>
-      <option value="2">English (2)</option>
-      <option value="2">Histology (2)</option>
-      <option value="2">Foundation Technology (2)</option>
     </select>
     <button class="remove-course">Remove</button>
   `;
