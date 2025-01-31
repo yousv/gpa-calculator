@@ -1,206 +1,261 @@
-const courseOptions = [
-  { name: 'Bacteriology', credits: 4 },
-  { name: 'Biochemistry', credits: 4 },
-  { name: 'Parasitology', credits: 2 },
-  { name: 'Mechatronics', credits: 2 },
-  { name: 'English', credits: 2 },
-  { name: 'Histology', credits: 2 },
-  { name: 'Foundation Technology', credits: 2 },
-];
+const defaultSemesters = [
+    {
+      id: 1,
+      courses: [
+        { name: 'THS101 - Basic physics', credits: '2', grade: '' },
+        { name: 'THS102 - Mathematics', credits: '2', grade: '' },
+        { name: 'THS103 - Introduction to electrical engineering', credits: '3', grade: '' },
+        { name: 'THS104 - Mechanics', credits: '2', grade: '' },
+        { name: 'UN101 - Academic reading & writing (1)', credits: '2', grade: '' },
+        { name: 'UN102 - Computer skills', credits: '2', grade: '' },
+        { name: 'UN103 - Critical thinking', credits: '2', grade: '' }
+      ]
+    },
+    {
+      id: 2,
+      courses: [
+        { name: 'THS1110 - Professional ethics', credits: '1', grade: '' },
+        { name: 'THS115 - Electronic circuits & devices', credits: '3', grade: '' },
+        { name: 'THS116 - General anatomy & histology for technologists', credits: '3', grade: '' },
+        { name: 'THS117 - General physiology for technologists', credits: '2', grade: '' },
+        { name: 'THS118 - General Microbiology', credits: '2', grade: '' },
+        { name: 'THS119 - General Chemistry', credits: '2', grade: '' },
+        { name: 'UN114 - Academic reading & writing (2)', credits: '2', grade: '' }
+      ]
+    },
+    {
+      id: 3,
+      courses: [
+        { name: 'THS2010 - Mechatronic engineering', credits: '2', grade: '' },
+        { name: 'TL201 - Biochemistry for technologists', credits: '4', grade: '' },
+        { name: 'TL202 - Parasitology for technologists', credits: '2', grade: '' },
+        { name: 'TL203 - Bacteriology for technologists', credits: '4', grade: '' },
+        { name: 'TL204 - Histology for laboratory for technologists', credits: '2', grade: '' },
+        { name: 'UN5 - Foundation of digital technology', credits: '2', grade: '' },
+        { name: 'UN6 - English language 3', credits: '2', grade: '' }
+      ]
+    }
+  ];
 
 const gradeOptions = [
-  { label: 'A+', value: 4.0 },
-  { label: 'A', value: 3.8 },
-  { label: 'A-', value: 3.6 },
-  { label: 'B+', value: 3.4 },
-  { label: 'B', value: 3.2 },
-  { label: 'B-', value: 3.0 },
-  { label: 'C+', value: 2.8 },
-  { label: 'C', value: 2.6 },
-  { label: 'C-', value: 2.4 },
-  { label: 'D+', value: 2.2 },
-  { label: 'D', value: 2.0 },
-  { label: 'F', value: 0.0 },
-];
-
-function getSelectedCourses() {
-  const selectedCourses = new Set();
-  document.querySelectorAll('.course-select').forEach(select => {
-      if (select.value !== '') {
-          selectedCourses.add(select.value);
-      }
-  });
-  return selectedCourses;
-}
-
-function updateAvailableCourses() {
-  const selectedCourses = getSelectedCourses();
+    { label: 'A+', value: 4.0 },
+    { label: 'A', value: 3.8 },
+    { label: 'A-', value: 3.6 },
+    { label: 'B+', value: 3.4 },
+    { label: 'B', value: 3.2 },
+    { label: 'B-', value: 3.0 },
+    { label: 'C+', value: 2.8 },
+    { label: 'C', value: 2.6 },
+    { label: 'C-', value: 2.4 },
+    { label: 'D+', value: 2.2 },
+    { label: 'D', value: 2.0 },
+    { label: 'F', value: 0.0 },
+  ];
   
-  document.querySelectorAll('.course-select').forEach(select => {
-      const currentValue = select.value;
-      
-      // Store current selection
-      const selectedOption = select.value;
-      
-      // Clear and rebuild options
-      select.innerHTML = '<option value="">Select Course</option>';
-      
-      courseOptions.forEach((course, index) => {
-          // Show course if it's either not selected anywhere else, or it's the current selection for this dropdown
-          if (!selectedCourses.has(index.toString()) || index.toString() === currentValue) {
-              const option = document.createElement('option');
-              option.value = index;
-              option.text = `${course.name} (${course.credits} credits)`;
-              option.selected = index.toString() === selectedOption;
-              select.appendChild(option);
-          }
-      });
-  });
-}
-
-function createCourseElement(courseIndex = '', gradeValue = '') {
-  const courseDiv = document.createElement('div');
-  courseDiv.className = 'course';
+  let semesters = [];
   
-  const courseSelect = document.createElement('select');
-  courseSelect.className = 'course-select';
-  courseSelect.innerHTML = '<option value="">Select Course</option>';
+  function createCourseElement(courseName = '', credits = '', gradeValue = '') {
+    const courseDiv = document.createElement('div');
+    courseDiv.className = 'course';
+    
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.className = 'course-name';
+    nameInput.placeholder = 'Course Name';
+    nameInput.value = courseName;
   
-  // Add only unselected courses and the previously selected course
-  const selectedCourses = getSelectedCourses();
-  courseOptions.forEach((course, index) => {
-      if (!selectedCourses.has(index.toString()) || index.toString() === courseIndex) {
-          const option = document.createElement('option');
-          option.value = index;
-          option.text = `${course.name} (${course.credits} credits)`;
-          option.selected = index.toString() === courseIndex;
-          courseSelect.appendChild(option);
-      }
-  });
-
-  const gradeSelect = document.createElement('select');
-  gradeSelect.className = 'grade-select';
-  gradeSelect.innerHTML = `
+    const creditsInput = document.createElement('input');
+    creditsInput.type = 'number';
+    creditsInput.className = 'credits-input';
+    creditsInput.placeholder = 'Credits';
+    creditsInput.min = '1';
+    creditsInput.value = credits;
+  
+    const gradeSelect = document.createElement('select');
+    gradeSelect.className = 'grade-select';
+    gradeSelect.innerHTML = `
       <option value="">Select Grade</option>
       ${gradeOptions.map(grade => `
-          <option value="${grade.value}" ${gradeValue === grade.value.toString() ? 'selected' : ''}>
-              ${grade.label}
-          </option>
+        <option value="${grade.value}" ${gradeValue === grade.value.toString() ? 'selected' : ''}>
+          ${grade.label}
+        </option>
       `).join('')}
-  `;
-
-  const removeButton = document.createElement('button');
-  removeButton.className = 'remove-btn';
-  removeButton.textContent = 'Remove';
-  removeButton.onclick = () => {
+    `;
+  
+    const removeButton = document.createElement('button');
+    removeButton.className = 'remove-btn';
+    removeButton.textContent = 'Remove';
+    removeButton.onclick = () => {
       courseDiv.remove();
-      updateAvailableCourses();
-      saveCourses();
-  };
-
-  // Add event listeners for saving data and updating available courses
-  courseSelect.addEventListener('change', () => {
-      updateAvailableCourses();
-      saveCourses();
-  });
-  gradeSelect.addEventListener('change', saveCourses);
-
-  courseDiv.appendChild(courseSelect);
-  courseDiv.appendChild(gradeSelect);
-  courseDiv.appendChild(removeButton);
-
-  return courseDiv;
-}
-
-function addCourse(courseIndex = '', gradeValue = '') {
-  const coursesContainer = document.getElementById('courses');
-  coursesContainer.appendChild(createCourseElement(courseIndex, gradeValue));
-  updateAvailableCourses();
-  document.getElementById('result').style.display = 'none';
-  document.getElementById('error').style.display = 'none';
-}
-
-function getGPAColor(gpa) {
-  if (gpa >= 3.5) return 'excellent';
-  if (gpa >= 3.0) return 'good';
-  if (gpa >= 2.5) return 'average';
-  return 'poor';
-}
-
-function saveCourses() {
-  const courses = [];
-  document.querySelectorAll('.course').forEach(course => {
-      const courseIndex = course.querySelector('.course-select').value;
-      const gradeValue = course.querySelector('.grade-select').value;
-      if (courseIndex || gradeValue) {
-          courses.push({ courseIndex, gradeValue });
+      saveSemesters();
+    };
+  
+    const inputs = [nameInput, creditsInput, gradeSelect];
+    inputs.forEach(input => {
+      input.addEventListener('change', saveSemesters);
+    });
+  
+    courseDiv.append(nameInput, creditsInput, gradeSelect, removeButton);
+    return courseDiv;
+  }
+  
+  function createSemesterElement(semesterData) {
+    const semesterDiv = document.createElement('div');
+    semesterDiv.className = 'semester';
+    semesterDiv.dataset.semesterId = semesterData.id;
+    
+    const header = document.createElement('div');
+    header.className = 'semester-header';
+    
+    const title = document.createElement('h2');
+    title.textContent = `Semester ${semesterData.id}`;
+    
+    const addCourseBtn = document.createElement('button');
+    addCourseBtn.className = 'add-course-btn';
+    addCourseBtn.textContent = 'Add Course';
+    addCourseBtn.onclick = () => addCourse(semesterDiv);
+    
+    const removeSemesterBtn = document.createElement('button');
+    removeSemesterBtn.className = 'remove-semester-btn';
+    removeSemesterBtn.textContent = 'Remove Semester';
+    removeSemesterBtn.onclick = () => {
+      semesterDiv.remove();
+      updateSemesterNumbers();
+      saveSemesters();
+      calculateCGPA();
+    };
+    
+    const coursesContainer = document.createElement('div');
+    coursesContainer.className = 'courses';
+    
+    const gpaDisplay = document.createElement('div');
+    gpaDisplay.className = 'semester-gpa';
+    
+    header.append(title, addCourseBtn, removeSemesterBtn);
+    semesterDiv.append(header, coursesContainer, gpaDisplay);
+    
+    if (semesterData.courses) {
+      semesterData.courses.forEach(course => {
+        coursesContainer.appendChild(createCourseElement(course.name, course.credits, course.grade));
+      });
+    }
+    
+    return semesterDiv;
+  }
+  
+  function addCourse(semesterDiv) {
+    const coursesContainer = semesterDiv.querySelector('.courses');
+    coursesContainer.appendChild(createCourseElement());
+    saveSemesters();
+  }
+  
+  function addSemester() {
+    const semestersContainer = document.getElementById('semesters');
+    const nextSemesterId = semestersContainer.children.length + 1;
+    const semesterDiv = createSemesterElement({ id: nextSemesterId, courses: [] });
+    semestersContainer.appendChild(semesterDiv);
+    addCourse(semesterDiv);
+    saveSemesters();
+  }
+  
+  function updateSemesterNumbers() {
+    document.querySelectorAll('.semester').forEach((semester, index) => {
+      const newId = index + 1;
+      semester.dataset.semesterId = newId;
+      semester.querySelector('h2').textContent = `Semester ${newId}`;
+    });
+  }
+  
+  function calculateSemesterGPA(semesterDiv) {
+    let totalPoints = 0;
+    let totalCredits = 0;
+    
+    semesterDiv.querySelectorAll('.course').forEach(course => {
+      const credits = parseFloat(course.querySelector('.credits-input').value);
+      const grade = parseFloat(course.querySelector('.grade-select').value);
+      
+      if (!isNaN(credits) && !isNaN(grade)) {
+        totalPoints += credits * grade;
+        totalCredits += credits;
       }
-  });
-  localStorage.setItem('gpa-courses', JSON.stringify(courses));
-}
-
-function loadCourses() {
-  const savedCourses = localStorage.getItem('gpa-courses');
-  if (savedCourses) {
-      const courses = JSON.parse(savedCourses);
-      if (courses.length > 0) {
-          courses.forEach(course => {
-              addCourse(course.courseIndex, course.gradeValue);
-          });
-      } else {
-          addCourse(); // Add one empty course if no saved courses
-      }
+    });
+    
+    const gpa = totalCredits > 0 ? totalPoints / totalCredits : 0;
+    semesterDiv.querySelector('.semester-gpa').textContent = `Semester GPA: ${gpa.toFixed(2)}`;
+    return { points: totalPoints, credits: totalCredits };
+  }
+  
+  function calculateCGPA() {
+    let totalPoints = 0;
+    let totalCredits = 0;
+    
+    document.querySelectorAll('.semester').forEach(semester => {
+      const semesterGPA = calculateSemesterGPA(semester);
+      totalPoints += semesterGPA.points;
+      totalCredits += semesterGPA.credits;
+    });
+    
+    const cgpa = totalCredits > 0 ? totalPoints / totalCredits : 0;
+    const cgpaDiv = document.getElementById('cgpa');
+    cgpaDiv.textContent = cgpa.toFixed(2);
+    cgpaDiv.className = `cgpa ${getGPAColor(cgpa)}`;
+  }
+  
+  function getGPAColor(gpa) {
+    if (gpa >= 3.5) return 'excellent';
+    if (gpa >= 3.0) return 'good';
+    if (gpa >= 2.5) return 'average';
+    return 'poor';
+  }
+  
+  function saveSemesters() {
+    const savedData = [];
+    document.querySelectorAll('.semester').forEach((semester, index) => {
+      const courses = [];
+      semester.querySelectorAll('.course').forEach(course => {
+        courses.push({
+          name: course.querySelector('.course-name').value,
+          credits: course.querySelector('.credits-input').value,
+          grade: course.querySelector('.grade-select').value
+        });
+      });
+      savedData.push({
+        id: index + 1,
+        courses: courses
+      });
+    });
+    localStorage.setItem('gpa-semesters', JSON.stringify(savedData));
+    calculateCGPA();
+  }
+  
+  function loadSemesters() {
+  const savedData = localStorage.getItem('gpa-semesters');
+  const semestersContainer = document.getElementById('semesters');
+  semestersContainer.innerHTML = '';
+  
+  if (savedData) {
+    const semesters = JSON.parse(savedData);
+    if (semesters.length > 0) {
+      semesters.forEach(semester => {
+        const semesterDiv = createSemesterElement(semester);
+        semestersContainer.appendChild(semesterDiv);
+      });
+    } else {
+      loadDefaultSemesters();
+    }
   } else {
-      addCourse(); // Add one empty course if no saved data
+    loadDefaultSemesters();
   }
+  calculateCGPA();
 }
 
-function calculateGPA() {
-  const courses = document.querySelectorAll('.course');
-  let totalGradePoints = 0;
-  let totalCredits = 0;
-  let hasError = false;
-
-  courses.forEach(course => {
-      const courseIndex = course.querySelector('.course-select').value;
-      const gradeValue = course.querySelector('.grade-select').value;
-
-      if (courseIndex === '' || gradeValue === '') {
-          hasError = true;
-          return;
-      }
-
-      const credits = courseOptions[parseInt(courseIndex)].credits;
-      totalGradePoints += parseFloat(gradeValue) * credits;
-      totalCredits += credits;
-  });
-
-  const errorDiv = document.getElementById('error');
-  const resultDiv = document.getElementById('result');
-  const gpaDiv = document.getElementById('gpa');
-
-  if (hasError) {
-      errorDiv.textContent = 'Please complete all course selections';
-      errorDiv.style.display = 'block';
-      resultDiv.style.display = 'none';
-      return;
+function loadDefaultSemesters() {
+    const semestersContainer = document.getElementById('semesters');
+    defaultSemesters.forEach(semester => {
+      const semesterDiv = createSemesterElement(semester);
+      semestersContainer.appendChild(semesterDiv);
+    });
+    saveSemesters();
   }
-
-  if (totalCredits === 0) {
-      errorDiv.textContent = 'Please add at least one course';
-      errorDiv.style.display = 'block';
-      resultDiv.style.display = 'none';
-      return;
-  }
-
-  const gpa = totalGradePoints / totalCredits;
-  errorDiv.style.display = 'none';
-  resultDiv.style.display = 'block';
-  gpaDiv.textContent = gpa.toFixed(2);
-  gpaDiv.className = `gpa ${getGPAColor(gpa)}`;
-
-  saveCourses();
-}
-
-// Load saved courses when page loads
-window.addEventListener('load', loadCourses);
+  
+  window.addEventListener('load', loadSemesters);
