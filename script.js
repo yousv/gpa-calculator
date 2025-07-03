@@ -34,6 +34,16 @@ const defaultSemesters = [
       { name: 'UN5 - Foundation of digital technology', credits: '2', grade: '' },
       { name: 'UN6 - English language 3', credits: '2', grade: '' }
     ]
+  },
+  {
+    id: 4,
+    courses: [
+      { name: 'TL215 - Molecular biology for technologists', credits: '4', grade: '' },
+      { name: 'TL216 - Hematology for technologists (1)', credits: '4', grade: '' },
+      { name: 'TL218 - General biology for technologists', credits: '3', grade: '' },
+      { name: 'TL217 - Systematic physiology for technologists', credits: '4', grade: '' },
+      { name: 'ETHS15 - Basic life support', credits: '1', grade: '' }
+    ]
   }
 ];
 
@@ -108,22 +118,29 @@ function createSemesterElement(semesterData) {
     saveSemesters();
     calculateCGPA();
   };
-  
+
   const coursesContainer = document.createElement('div');
   coursesContainer.className = 'courses';
-  
+
   const gpaDisplay = document.createElement('div');
   gpaDisplay.className = 'semester-gpa';
+
+  // Add click handler for collapse
+  header.addEventListener('click', (e) => {
+    if (!e.target.matches('button')) {
+      semesterDiv.classList.toggle('collapsed');
+    }
+  });
   
   header.append(title, addCourseBtn, removeSemesterBtn);
   semesterDiv.append(header, coursesContainer, gpaDisplay);
-  
+
   if (semesterData.courses) {
     semesterData.courses.forEach(course => {
       coursesContainer.appendChild(createCourseElement(course.name, course.credits, course.grade, false));
     });
   }
-  
+
   return semesterDiv;
 }
 
@@ -153,11 +170,11 @@ function updateSemesterNumbers() {
 function calculateSemesterGPA(semesterDiv) {
   let totalPoints = 0;
   let totalCredits = 0;
-  
+
   semesterDiv.querySelectorAll('.course').forEach(course => {
     const credits = parseFloat(course.querySelector('.credits-input').value);
     const grade = parseFloat(course.querySelector('.grade-input').value);
-    
+
     if (!isNaN(credits) && !isNaN(grade)) {
       totalPoints += credits * (grade / 100 * 4);
       totalCredits += credits;
