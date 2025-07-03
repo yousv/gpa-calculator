@@ -8,23 +8,28 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
+        <header class="header">
             <h1>HNU - AHST GPA Calculator</h1>
-        </div>
+        </header>
 
         <div class="cgpa-display">
-            <h2>CGPA</h2>
-            <div id="cgpa" class="cgpa">0.00</div>
+            <div class="cgpa-card">
+                <h2>CGPA</h2>
+                <div id="cgpa" class="cgpa">0.00</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="toggle-all" class="control-btn">
+                <span class="button-text">Expand All</span>
+            </button>
+            <button id="reset-grades" class="control-btn danger">Reset Grades</button>
         </div>
 
         <div id="semesters" class="semesters"></div>
 
-        <div class="actions">
-            <button class="add-semester-btn" onclick="addSemester()">Add Semester</button>
-        </div>
-
-        <footer class="copyright">
-            Made by Yousef Khaled Ibrahim
+        <footer class="footer">
+            <p>Yousef Khaled Ibrahim</p>
         </footer>
     </div>
 
