@@ -54,18 +54,14 @@ class GPACalculator {
 
   init() {
     this.renderSemesters()
-    this.setupEventListeners()
+    document.getElementById("toggle-all").addEventListener("click", () => this.toggleAll())
+    document.getElementById("reset-grades").addEventListener("click", () => this.resetGrades())
     this.calculateCGPA()
     this.addStaggeredAnimation()
     this.updateToggleButton()
   }
 
-  setupEventListeners() {
-    document.getElementById("toggle-all").addEventListener("click", () => this.toggleAll())
-    document.getElementById("reset-grades").addEventListener("click", () => this.resetGrades())
-  }
-
-  createCourseElement(courseName = "", credits = "", gradeValue = "", semesterIdx, courseIdx) {
+  createCourseElement(courseName, credits, gradeValue, semesterIdx, courseIdx) {
     const courseDiv = document.createElement("div")
     courseDiv.className = "course"
 
@@ -198,8 +194,6 @@ class GPACalculator {
   updateToggleButton() {
     const toggleButton = document.getElementById("toggle-all")
     const buttonText = toggleButton.querySelector(".button-text")
-    const buttonIcon = toggleButton.querySelector(".button-icon")
-
     const semesters = document.querySelectorAll(".semester")
     const collapsedCount = document.querySelectorAll(".semester.collapsed").length
     const shouldExpand = collapsedCount > semesters.length / 2
@@ -317,9 +311,9 @@ class GPACalculator {
 
   saveGradesToStorage() {
     const grades = []
-    document.querySelectorAll(".semester").forEach((semesterDiv, semesterIdx) => {
+    document.querySelectorAll(".semester").forEach((semesterDiv) => {
       const semesterGrades = []
-      semesterDiv.querySelectorAll(".course").forEach((courseDiv, courseIdx) => {
+      semesterDiv.querySelectorAll(".course").forEach((courseDiv) => {
         const gradeInput = courseDiv.querySelector(".grade-input")
         semesterGrades.push(gradeInput.value)
       })
@@ -332,9 +326,7 @@ class GPACalculator {
     try {
       const grades = JSON.parse(localStorage.getItem("gpa-grades"))
       if (Array.isArray(grades)) return grades
-    } catch (error) {
-      console.warn("Failed to load grades from storage:", error)
-    }
+    } catch {}
     return null
   }
 
@@ -359,12 +351,4 @@ class GPACalculator {
 
 document.addEventListener("DOMContentLoaded", () => {
   new GPACalculator()
-})
-
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    document.querySelectorAll(".semester").forEach((semester) => {
-      semester.classList.add("collapsed")
-    })
-  }
 })
