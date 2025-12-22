@@ -76,13 +76,16 @@
         color: #fca5a5;
       }
 
-      /* Smooth shadow for active semester */
       .semester-card {
         transition: border-color 0.3s ease, background-color 0.3s ease;
       }
       .semester-card:not(.is-collapsed) {
         border-color: #27272a;
         background-color: #0c0c0e;
+      }
+
+      #import-modal {
+        backdrop-filter: blur(8px);
       }
     </style>
   </head>
@@ -127,10 +130,16 @@
         </h2>
         <div class="flex gap-1.5">
           <button
+            onclick="app.openImportModal()"
+            class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold uppercase tracking-wider py-1.5 px-3 rounded-md transition active:scale-95 shadow-lg shadow-blue-900/20"
+          >
+            Smart Import
+          </button>
+          <button
             id="toggle-all"
             class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[10px] font-bold uppercase tracking-wider py-1.5 px-3 rounded-md border border-zinc-700 transition active:scale-95"
           >
-            Expand All
+            Expand
           </button>
           <button
             id="reset-grades"
@@ -143,6 +152,43 @@
 
       <div id="semesters-container" class="space-y-3"></div>
     </main>
+
+    <div
+      id="import-modal"
+      class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/60"
+    >
+      <div
+        class="bg-zinc-900 border border-zinc-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden"
+      >
+        <div class="p-6">
+          <h3 class="text-lg font-bold text-zinc-100 mb-2">Portal Import</h3>
+          <p class="text-sm text-zinc-400 mb-4">
+            Go to <b>Final Grades</b> on the HNU portal, copy all text, and
+            paste it here.
+          </p>
+          <textarea
+            id="import-area"
+            class="w-full h-48 bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-xs text-zinc-300 font-mono focus:ring-1 focus:ring-blue-500 outline-none resize-none"
+            placeholder="Paste portal text here..."
+          ></textarea>
+
+          <div class="flex gap-3 mt-6">
+            <button
+              onclick="app.closeImportModal()"
+              class="flex-1 px-4 py-3 rounded-xl bg-zinc-800 text-zinc-300 font-bold text-sm hover:bg-zinc-700 transition"
+            >
+              Cancel
+            </button>
+            <button
+              onclick="app.processImport()"
+              class="flex-1 px-4 py-3 rounded-xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-500 transition"
+            >
+              Extract Grades
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <footer class="border-t border-zinc-900/50 py-6">
       <div class="container mx-auto text-center px-4">
@@ -157,16 +203,6 @@
     <script>
       class GPACalculator {
         constructor() {
-          this.semesterConfig = {
-            1: true,
-            2: true,
-            3: true,
-            4: true,
-            5: true,
-            6: false,
-            7: false,
-            8: false,
-          };
           this.currentCGPA = 0;
           this.isAllExpanded = false;
           this.defaultSemesters = [
@@ -227,7 +263,6 @@
                   name: "Electronic Circuits & Devices",
                   credits: 3,
                   maxGrade: 150,
-                  prereq: "THS103",
                 },
                 {
                   code: "THS116",
@@ -248,7 +283,7 @@
                   maxGrade: 100,
                 },
                 {
-                  code: "TSH119",
+                  code: "THS119",
                   name: "General Chemistry",
                   credits: 2,
                   maxGrade: 100,
@@ -258,7 +293,6 @@
                   name: "Academic Reading & Writing (2)",
                   credits: 2,
                   maxGrade: 100,
-                  prereq: "UN101",
                 },
                 {
                   code: "THS1110",
@@ -266,10 +300,40 @@
                   credits: 1,
                   maxGrade: 50,
                 },
+                {
+                  code: "UN30",
+                  name: "Social Issues",
+                  credits: 2,
+                  maxGrade: 50,
+                },
               ],
             },
             {
               id: 3,
+              title: "Summer Courses",
+              courses: [
+                {
+                  code: "THS102",
+                  name: "Mathematics (Repeat)",
+                  credits: 2,
+                  maxGrade: 100,
+                },
+                {
+                  code: "THS104",
+                  name: "Mechanics (Repeat)",
+                  credits: 2,
+                  maxGrade: 100,
+                },
+                {
+                  code: "THS115",
+                  name: "Electronics (Repeat)",
+                  credits: 3,
+                  maxGrade: 150,
+                },
+              ],
+            },
+            {
+              id: 4,
               title: "2nd Year - Sem 1",
               courses: [
                 {
@@ -277,35 +341,30 @@
                   name: "Mechatronics Engineering",
                   credits: 2,
                   maxGrade: 100,
-                  prereq: "THS115",
                 },
                 {
                   code: "TL201",
-                  name: "Biochemistry (1)",
+                  name: "Biochemistry",
                   credits: 4,
                   maxGrade: 200,
-                  prereq: "TSH119",
                 },
                 {
                   code: "TL202",
                   name: "Parasitology (1)",
                   credits: 2,
                   maxGrade: 100,
-                  prereq: "THS116",
                 },
                 {
                   code: "TL203",
                   name: "Bacteriology",
                   credits: 4,
                   maxGrade: 200,
-                  prereq: "THS118",
                 },
                 {
                   code: "TL204",
                   name: "Histology for Lab",
                   credits: 2,
                   maxGrade: 100,
-                  prereq: "THS116",
                 },
                 {
                   code: "UN5",
@@ -318,12 +377,11 @@
                   name: "English Language 3",
                   credits: 2,
                   maxGrade: 100,
-                  prereq: "UN114",
                 },
               ],
             },
             {
-              id: 4,
+              id: 5,
               title: "2nd Year - Sem 2",
               courses: [
                 {
@@ -331,21 +389,18 @@
                   name: "Molecular Biology",
                   credits: 4,
                   maxGrade: 200,
-                  prereq: "TL201",
                 },
                 {
                   code: "TL216",
                   name: "Hematology (1)",
                   credits: 4,
                   maxGrade: 200,
-                  prereq: "THS117",
                 },
                 {
                   code: "TL217",
                   name: "Systematic Physiology",
                   credits: 4,
                   maxGrade: 200,
-                  prereq: "THS117",
                 },
                 {
                   code: "TL218",
@@ -354,56 +409,10 @@
                   maxGrade: 150,
                 },
                 {
-                  code: "ETHS1",
-                  name: "Elective Faculty (1)",
+                  code: "ETHS15",
+                  name: "Basic Life Support",
                   credits: 1,
                   maxGrade: 50,
-                },
-              ],
-            },
-            {
-              id: 5,
-              title: "3rd Year - Sem 1",
-              courses: [
-                {
-                  code: "TL309",
-                  name: "Lab Instrumentation (1)",
-                  credits: 4,
-                  maxGrade: 200,
-                  prereq: "THS2010",
-                },
-                {
-                  code: "TL3010",
-                  name: "Enzymology & Hormones",
-                  credits: 4,
-                  maxGrade: 200,
-                  prereq: "TL201",
-                },
-                {
-                  code: "TL3011",
-                  name: "Parasitology (2)",
-                  credits: 3,
-                  maxGrade: 150,
-                  prereq: "TL202",
-                },
-                {
-                  code: "TL3012",
-                  name: "Systematic Pathology",
-                  credits: 3,
-                  maxGrade: 150,
-                  prereq: "TL217",
-                },
-                {
-                  code: "THS3011",
-                  name: "Infection Control & Safety",
-                  credits: 2,
-                  maxGrade: 100,
-                },
-                {
-                  code: "UN7",
-                  name: "Innovation & Entrepreneurship",
-                  credits: 2,
-                  maxGrade: 100,
                 },
               ],
             },
@@ -460,31 +469,25 @@
         }
 
         renderCourseRow(course, semIdx, courseIdx, value) {
-          const prereqHtml = course.prereq
-            ? `<span class="text-[8px] text-red-500/80 font-bold ml-1">REQ: ${course.prereq}</span>`
-            : "";
           return `
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-3 border-b border-zinc-800/40 last:border-0">
                         <div class="flex-1 min-w-0">
                             <div class="flex flex-wrap items-center gap-1.5 mb-0.5">
-                                <span class="font-bold text-zinc-200 text-xs leading-snug uppercase tracking-tight">${course.name}</span>
+                                <span class="font-bold text-zinc-200 text-xs uppercase tracking-tight">${course.name}</span>
                                 <span class="text-[8px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500 font-bold border border-zinc-700/30 whitespace-nowrap">${course.credits} CR</span>
                             </div>
-                            <div class="text-[9px] text-zinc-600 font-bold tracking-wider uppercase">${course.code} ${prereqHtml}</div>
+                            <div class="text-[9px] text-zinc-600 font-bold tracking-wider uppercase">${course.code}</div>
                         </div>
-                        <div class="flex items-center self-end sm:self-center gap-2 bg-zinc-950 border border-zinc-800 rounded-lg px-2.5 py-1.5 focus-within:ring-1 focus-within:ring-zinc-600 transition-all">
+                        <div class="flex items-center self-end sm:self-center gap-2 bg-zinc-950 border border-zinc-800 rounded-lg px-2.5 py-1.5 focus-within:ring-1 focus-within:ring-zinc-600">
                             <input 
                                 type="number" 
-                                class="grade-input w-12 bg-transparent text-center text-sm font-black text-zinc-100 outline-none" 
+                                class="grade-input w-14 bg-transparent text-center text-sm font-black text-zinc-100 outline-none" 
                                 placeholder="0" 
-                                inputmode="numeric"
-                                min="0" 
-                                max="${course.maxGrade}"
-                                value="${value}"
+                                data-code="${course.code}"
                                 data-sem-idx="${semIdx}"
                                 data-course-idx="${courseIdx}"
-                                data-credits="${course.credits}"
                                 data-max="${course.maxGrade}"
+                                value="${value}"
                                 oninput="app.handleInput(this)"
                             >
                             <span class="text-[9px] font-bold text-zinc-700 select-none">/ ${course.maxGrade}</span>
@@ -493,57 +496,107 @@
                 `;
         }
 
+        openImportModal() {
+          document.getElementById("import-modal").classList.remove("hidden");
+          document.getElementById("import-area").value = "";
+        }
+
+        closeImportModal() {
+          document.getElementById("import-modal").classList.add("hidden");
+        }
+
+        processImport() {
+          const text = document.getElementById("import-area").value;
+          if (!text.trim()) return;
+
+          const inputs = document.querySelectorAll(".grade-input");
+          let foundCount = 0;
+
+          inputs.forEach((input) => {
+            const code = input.dataset.code;
+            const regex = new RegExp(
+              code + "[^]*?(\\d+(?:\\.\\d+)?)\\s*\\/",
+              "i"
+            );
+            const match = text.match(regex);
+
+            if (match && match[1]) {
+              input.value = match[1];
+              foundCount++;
+            }
+          });
+
+          this.saveGrades();
+          this.calculateCGPA(true);
+          this.closeImportModal();
+
+          if (foundCount > 0) {
+            this.renderSemesters();
+            this.calculateCGPA(false);
+          } else {
+            alert("Could not extract any grades.");
+          }
+        }
+
+        /**
+         * Accordion Logic: Toggles target and collapses all others
+         */
         toggleSemester(headerBtn) {
           const card = headerBtn.closest(".semester-card");
           const content = headerBtn.nextElementSibling;
-          const isCurrentlyCollapsed = content.classList.contains("collapsed");
+          const isExpanding = content.classList.contains("collapsed");
 
-          // Accordion behavior: Close all others if we are opening this one
-          if (isCurrentlyCollapsed) {
-            document.querySelectorAll(".semester-content").forEach((el) => {
-              el.classList.add("collapsed");
-              el.previousElementSibling.classList.add("collapsed");
-              el.closest(".semester-card").classList.add("is-collapsed");
+          // If we are expanding this semester, collapse all others first
+          if (isExpanding) {
+            document.querySelectorAll(".semester-card").forEach((otherCard) => {
+              if (otherCard !== card) {
+                const otherHeader = otherCard.querySelector(".semester-header");
+                const otherContent =
+                  otherCard.querySelector(".semester-content");
+
+                otherHeader.classList.add("collapsed");
+                otherContent.classList.add("collapsed");
+                otherCard.classList.add("is-collapsed");
+              }
             });
           }
 
-          // Toggle this one
-          const willBeCollapsed = !isCurrentlyCollapsed;
-          content.classList.toggle("collapsed", willBeCollapsed);
-          headerBtn.classList.toggle("collapsed", willBeCollapsed);
-          card.classList.toggle("is-collapsed", willBeCollapsed);
+          // Toggle the clicked one
+          content.classList.toggle("collapsed");
+          headerBtn.classList.toggle("collapsed");
+          card.classList.toggle("is-collapsed");
 
-          // Update Expand All button state
           this.updateToggleAllButton();
         }
 
+        /**
+         * Bulk expand/collapse
+         */
         toggleAll() {
           this.isAllExpanded = !this.isAllExpanded;
-          const contents = document.querySelectorAll(".semester-content");
-          const headers = document.querySelectorAll(".semester-header");
-          const cards = document.querySelectorAll(".semester-card");
+          document.querySelectorAll(".semester-card").forEach((card) => {
+            const header = card.querySelector(".semester-header");
+            const content = card.querySelector(".semester-content");
 
-          contents.forEach((el, i) => {
-            el.classList.toggle("collapsed", !this.isAllExpanded);
-            headers[i].classList.toggle("collapsed", !this.isAllExpanded);
-            cards[i].classList.toggle("is-collapsed", !this.isAllExpanded);
+            content.classList.toggle("collapsed", !this.isAllExpanded);
+            header.classList.toggle("collapsed", !this.isAllExpanded);
+            card.classList.toggle("is-collapsed", !this.isAllExpanded);
           });
-
           this.updateToggleAllButton();
         }
 
         updateToggleAllButton() {
-          const allCollapsed = Array.from(
+          const someExpanded = Array.from(
             document.querySelectorAll(".semester-content")
-          ).every((el) => el.classList.contains("collapsed"));
-          this.isAllExpanded = !allCollapsed;
+          ).some((el) => !el.classList.contains("collapsed"));
+          this.isAllExpanded = someExpanded;
           document.getElementById("toggle-all").textContent = this.isAllExpanded
-            ? "Collapse All"
-            : "Expand All";
+            ? "Collapse"
+            : "Expand";
         }
 
         resetGrades() {
-          if (!confirm("Wipe all academic data?")) return;
+          if (!confirm("Wipe all data?")) return;
           localStorage.removeItem("gpa-grades-hnu");
           document
             .querySelectorAll(".grade-input")
@@ -564,38 +617,20 @@
           }, 200);
         }
 
-        animateValue(obj, start, end, duration) {
-          let startTimestamp = null;
-          const step = (timestamp) => {
-            if (!startTimestamp) startTimestamp = timestamp;
-            const progress = Math.min(
-              (timestamp - startTimestamp) / duration,
-              1
-            );
-            const val = (progress * (end - start) + start).toFixed(2);
-            obj.innerHTML = val;
-            if (progress < 1) {
-              window.requestAnimationFrame(step);
-            }
-          };
-          window.requestAnimationFrame(step);
-        }
-
         calculateCGPA(animate = true) {
           let totalPoints = 0,
             totalCredits = 0;
-          const semesterCards = document.querySelectorAll(".semester-card");
+          const semesters = this.defaultSemesters;
 
-          semesterCards.forEach((card, idx) => {
+          document.querySelectorAll(".semester-card").forEach((card, idx) => {
             let semPoints = 0,
               semCredits = 0;
-            card.querySelectorAll(".grade-input").forEach((input) => {
-              const val = parseFloat(input.value),
-                max = parseFloat(input.dataset.max),
-                cr = parseFloat(input.dataset.credits);
+            card.querySelectorAll(".grade-input").forEach((input, cIdx) => {
+              const val = parseFloat(input.value);
+              const course = semesters[idx].courses[cIdx];
               if (!isNaN(val)) {
-                semPoints += (val / max) * 4.0 * cr;
-                semCredits += cr;
+                semPoints += (val / course.maxGrade) * 4.0 * course.credits;
+                semCredits += course.credits;
               }
             });
 
@@ -621,7 +656,6 @@
           } else {
             display.textContent = newCGPA.toFixed(2);
           }
-
           this.currentCGPA = newCGPA;
 
           if (totalCredits > 0) {
@@ -630,6 +664,20 @@
             display.className =
               "text-2xl font-black text-zinc-100 tabular-nums leading-tight";
           }
+        }
+
+        animateValue(obj, start, end, duration) {
+          let startTimestamp = null;
+          const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min(
+              (timestamp - startTimestamp) / duration,
+              1
+            );
+            obj.innerHTML = (progress * (end - start) + start).toFixed(2);
+            if (progress < 1) window.requestAnimationFrame(step);
+          };
+          window.requestAnimationFrame(step);
         }
 
         applyColor(el, gpa, isBg) {
@@ -647,9 +695,9 @@
             "bg-zinc-800"
           );
           let type =
-            gpa >= 3.5
+            gpa >= 3.4
               ? "excellent"
-              : gpa >= 3.0
+              : gpa >= 2.8
               ? "good"
               : gpa >= 2.0
               ? "average"
@@ -658,11 +706,12 @@
         }
 
         saveGrades() {
-          const grades = Array.from({ length: 9 }, () => []);
+          const grades = Array.from(
+            { length: this.defaultSemesters.length },
+            () => []
+          );
           document.querySelectorAll(".grade-input").forEach((input) => {
-            const sIdx = parseInt(input.dataset.semIdx);
-            const cIdx = parseInt(input.dataset.courseIdx);
-            grades[sIdx][cIdx] = input.value;
+            grades[input.dataset.semIdx][input.dataset.courseIdx] = input.value;
           });
           localStorage.setItem("gpa-grades-hnu", JSON.stringify(grades));
         }
