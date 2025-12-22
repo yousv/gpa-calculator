@@ -1,38 +1,691 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HNU - AHST GPA Calculator</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="container">
-        <header class="header">
-            <h1>HNU - AHST GPA Calculator</h1>
-        </header>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/inter-ui/3.19.3/inter.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #09090b;
+        color: #fafafa;
+        -webkit-tap-highlight-color: transparent;
+      }
 
-        <div class="cgpa-display">
-            <div class="cgpa-card">
-                <h2>CGPA</h2>
-                <div id="cgpa" class="cgpa">0.00</div>
-            </div>
+      .semester-content {
+        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+          opacity 0.2s ease-in;
+        max-height: 2000px;
+        opacity: 1;
+        overflow: hidden;
+      }
+      .semester-content.collapsed {
+        max-height: 0;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .chevron {
+        transition: transform 0.3s ease;
+      }
+      .collapsed .chevron {
+        transform: rotate(-90deg);
+      }
+
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+
+      .text-excellent {
+        color: #4ade80;
+      }
+      .text-good {
+        color: #60a5fa;
+      }
+      .text-average {
+        color: #fbbf24;
+      }
+      .text-poor {
+        color: #f87171;
+      }
+
+      .bg-excellent {
+        background-color: #064e3b;
+        color: #4ade80;
+      }
+      .bg-good {
+        background-color: #1e3a8a;
+        color: #93c5fd;
+      }
+      .bg-average {
+        background-color: #713f12;
+        color: #fde047;
+      }
+      .bg-poor {
+        background-color: #7f1d1d;
+        color: #fca5a5;
+      }
+
+      /* Smooth shadow for active semester */
+      .semester-card {
+        transition: border-color 0.3s ease, background-color 0.3s ease;
+      }
+      .semester-card:not(.is-collapsed) {
+        border-color: #27272a;
+        background-color: #0c0c0e;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <header
+      class="bg-zinc-900/80 backdrop-blur-md sticky top-0 z-50 border-b border-zinc-800"
+    >
+      <div
+        class="container mx-auto max-w-xl px-4 py-3 flex justify-between items-center"
+      >
+        <div class="overflow-hidden mr-2">
+          <h1 class="text-base font-bold text-zinc-100 truncate">HNU - AHST</h1>
+          <p
+            class="text-[9px] text-zinc-500 uppercase tracking-widest font-medium truncate"
+          >
+            Medical Laboratory
+          </p>
         </div>
 
-        <div class="controls">
-            <button id="toggle-all" class="control-btn">
-                <span class="button-text">Expand All</span>
-            </button>
-            <button id="reset-grades" class="control-btn danger">Reset Grades</button>
+        <div class="text-right flex-shrink-0">
+          <div
+            class="text-[9px] uppercase tracking-wider text-zinc-500 font-bold"
+          >
+            Total GPA
+          </div>
+          <div
+            id="cgpa-display"
+            class="text-2xl font-black text-zinc-100 tabular-nums leading-tight"
+          >
+            0.00
+          </div>
         </div>
+      </div>
+    </header>
 
-        <div id="semesters" class="semesters"></div>
+    <main class="flex-1 container mx-auto max-w-xl px-3 py-6">
+      <div class="flex justify-between items-center mb-4 px-1">
+        <h2
+          class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest"
+        >
+          Academic Records
+        </h2>
+        <div class="flex gap-1.5">
+          <button
+            id="toggle-all"
+            class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[10px] font-bold uppercase tracking-wider py-1.5 px-3 rounded-md border border-zinc-700 transition active:scale-95"
+          >
+            Expand All
+          </button>
+          <button
+            id="reset-grades"
+            class="bg-zinc-900 hover:bg-red-950/30 text-red-500 text-[10px] font-bold uppercase tracking-wider py-1.5 px-3 rounded-md border border-red-900/30 transition active:scale-95"
+          >
+            Reset
+          </button>
+        </div>
+      </div>
 
-        <footer class="footer">
-            <p>Yousef Khaled Ibrahim</p>
-        </footer>
-    </div>
+      <div id="semesters-container" class="space-y-3"></div>
+    </main>
 
-    <script src="script.js"></script>
-</body>
+    <footer class="border-t border-zinc-900/50 py-6">
+      <div class="container mx-auto text-center px-4">
+        <p
+          class="text-[10px] text-zinc-600 uppercase tracking-widest font-medium"
+        >
+          Developed by Yousef Khaled Ibrahim
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      class GPACalculator {
+        constructor() {
+          this.semesterConfig = {
+            1: true,
+            2: true,
+            3: true,
+            4: true,
+            5: true,
+            6: false,
+            7: false,
+            8: false,
+          };
+          this.currentCGPA = 0;
+          this.isAllExpanded = false;
+          this.defaultSemesters = [
+            {
+              id: 1,
+              title: "1st Year - Sem 1",
+              courses: [
+                {
+                  code: "UN101",
+                  name: "Academic Reading & Writing (1)",
+                  credits: 2,
+                  maxGrade: 100,
+                },
+                {
+                  code: "THS101",
+                  name: "Basic Physics",
+                  credits: 2,
+                  maxGrade: 100,
+                },
+                {
+                  code: "THS102",
+                  name: "Mathematics",
+                  credits: 2,
+                  maxGrade: 100,
+                },
+                {
+                  code: "THS103",
+                  name: "Intro to Electrical Eng.",
+                  credits: 3,
+                  maxGrade: 150,
+                },
+                {
+                  code: "UN102",
+                  name: "Computer Skills",
+                  credits: 2,
+                  maxGrade: 100,
+                },
+                {
+                  code: "THS104",
+                  name: "Mechanics",
+                  credits: 2,
+                  maxGrade: 100,
+                },
+                {
+                  code: "UN103",
+                  name: "Critical thinking",
+                  credits: 2,
+                  maxGrade: 100,
+                },
+              ],
+            },
+            {
+              id: 2,
+              title: "1st Year - Sem 2",
+              courses: [
+                {
+                  code: "THS115",
+                  name: "Electronic Circuits & Devices",
+                  credits: 3,
+                  maxGrade: 150,
+                  prereq: "THS103",
+                },
+                {
+                  code: "THS116",
+                  name: "General Anatomy & Histology",
+                  credits: 3,
+                  maxGrade: 150,
+                },
+                {
+                  code: "THS117",
+                  name: "General Physiology",
+                  credits: 2,
+                  maxGrade: 100,
+                },
+                {
+                  code: "THS118",
+                  name: "General Microbiology",
+                  credits: 2,
+                  maxGrade: 100,
+                },
+                {
+                  code: "TSH119",
+                  name: "General Chemistry",
+                  credits: 2,
+                  maxGrade: 100,
+                },
+                {
+                  code: "UN114",
+                  name: "Academic Reading & Writing (2)",
+                  credits: 2,
+                  maxGrade: 100,
+                  prereq: "UN101",
+                },
+                {
+                  code: "THS1110",
+                  name: "Professional Ethics",
+                  credits: 1,
+                  maxGrade: 50,
+                },
+              ],
+            },
+            {
+              id: 3,
+              title: "2nd Year - Sem 1",
+              courses: [
+                {
+                  code: "THS2010",
+                  name: "Mechatronics Engineering",
+                  credits: 2,
+                  maxGrade: 100,
+                  prereq: "THS115",
+                },
+                {
+                  code: "TL201",
+                  name: "Biochemistry (1)",
+                  credits: 4,
+                  maxGrade: 200,
+                  prereq: "TSH119",
+                },
+                {
+                  code: "TL202",
+                  name: "Parasitology (1)",
+                  credits: 2,
+                  maxGrade: 100,
+                  prereq: "THS116",
+                },
+                {
+                  code: "TL203",
+                  name: "Bacteriology",
+                  credits: 4,
+                  maxGrade: 200,
+                  prereq: "THS118",
+                },
+                {
+                  code: "TL204",
+                  name: "Histology for Lab",
+                  credits: 2,
+                  maxGrade: 100,
+                  prereq: "THS116",
+                },
+                {
+                  code: "UN5",
+                  name: "Digital Technology Foundation",
+                  credits: 2,
+                  maxGrade: 100,
+                },
+                {
+                  code: "UN6",
+                  name: "English Language 3",
+                  credits: 2,
+                  maxGrade: 100,
+                  prereq: "UN114",
+                },
+              ],
+            },
+            {
+              id: 4,
+              title: "2nd Year - Sem 2",
+              courses: [
+                {
+                  code: "TL215",
+                  name: "Molecular Biology",
+                  credits: 4,
+                  maxGrade: 200,
+                  prereq: "TL201",
+                },
+                {
+                  code: "TL216",
+                  name: "Hematology (1)",
+                  credits: 4,
+                  maxGrade: 200,
+                  prereq: "THS117",
+                },
+                {
+                  code: "TL217",
+                  name: "Systematic Physiology",
+                  credits: 4,
+                  maxGrade: 200,
+                  prereq: "THS117",
+                },
+                {
+                  code: "TL218",
+                  name: "General Biology",
+                  credits: 3,
+                  maxGrade: 150,
+                },
+                {
+                  code: "ETHS1",
+                  name: "Elective Faculty (1)",
+                  credits: 1,
+                  maxGrade: 50,
+                },
+              ],
+            },
+            {
+              id: 5,
+              title: "3rd Year - Sem 1",
+              courses: [
+                {
+                  code: "TL309",
+                  name: "Lab Instrumentation (1)",
+                  credits: 4,
+                  maxGrade: 200,
+                  prereq: "THS2010",
+                },
+                {
+                  code: "TL3010",
+                  name: "Enzymology & Hormones",
+                  credits: 4,
+                  maxGrade: 200,
+                  prereq: "TL201",
+                },
+                {
+                  code: "TL3011",
+                  name: "Parasitology (2)",
+                  credits: 3,
+                  maxGrade: 150,
+                  prereq: "TL202",
+                },
+                {
+                  code: "TL3012",
+                  name: "Systematic Pathology",
+                  credits: 3,
+                  maxGrade: 150,
+                  prereq: "TL217",
+                },
+                {
+                  code: "THS3011",
+                  name: "Infection Control & Safety",
+                  credits: 2,
+                  maxGrade: 100,
+                },
+                {
+                  code: "UN7",
+                  name: "Innovation & Entrepreneurship",
+                  credits: 2,
+                  maxGrade: 100,
+                },
+              ],
+            },
+          ];
+          this.init();
+        }
+
+        init() {
+          this.renderSemesters();
+          this.attachGlobalListeners();
+          this.calculateCGPA(false);
+        }
+
+        renderSemesters() {
+          const container = document.getElementById("semesters-container");
+          container.innerHTML = "";
+          const storedGrades = this.loadGradesFromStorage() || [];
+
+          this.defaultSemesters.forEach((semester, index) => {
+            const semesterDiv = document.createElement("div");
+            semesterDiv.className =
+              "semester-card bg-zinc-900 rounded-lg border border-zinc-800 overflow-hidden is-collapsed";
+            semesterDiv.innerHTML = `
+                        <button class="semester-header w-full flex justify-between items-center p-4 hover:bg-zinc-800/40 transition-colors text-left collapsed" onclick="app.toggleSemester(this)">
+                            <div class="flex items-center gap-3 overflow-hidden mr-2">
+                                <span class="chevron text-zinc-600 text-[9px] flex-shrink-0">▼</span>
+                                <h3 class="font-bold text-zinc-100 text-[13px] tracking-tight truncate">${
+                                  semester.title
+                                }</h3>
+                            </div>
+                            <div class="semester-gpa-badge text-[10px] font-black px-2.5 py-1 rounded-full bg-zinc-800 text-zinc-400 min-w-[3rem] text-center border border-zinc-700/50 flex-shrink-0">
+                                -
+                            </div>
+                        </button>
+                        <div class="semester-content collapsed">
+                            <div class="px-4 pb-4 pt-0 space-y-1 border-t border-zinc-800/50 mt-1">
+                                ${semester.courses
+                                  .map((course, courseIdx) => {
+                                    const savedVal =
+                                      storedGrades[index]?.[courseIdx] || "";
+                                    return this.renderCourseRow(
+                                      course,
+                                      index,
+                                      courseIdx,
+                                      savedVal
+                                    );
+                                  })
+                                  .join("")}
+                            </div>
+                        </div>
+                    `;
+            container.appendChild(semesterDiv);
+          });
+        }
+
+        renderCourseRow(course, semIdx, courseIdx, value) {
+          const prereqHtml = course.prereq
+            ? `<span class="text-[8px] text-red-500/80 font-bold ml-1">REQ: ${course.prereq}</span>`
+            : "";
+          return `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-3 border-b border-zinc-800/40 last:border-0">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex flex-wrap items-center gap-1.5 mb-0.5">
+                                <span class="font-bold text-zinc-200 text-xs leading-snug uppercase tracking-tight">${course.name}</span>
+                                <span class="text-[8px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500 font-bold border border-zinc-700/30 whitespace-nowrap">${course.credits} CR</span>
+                            </div>
+                            <div class="text-[9px] text-zinc-600 font-bold tracking-wider uppercase">${course.code} ${prereqHtml}</div>
+                        </div>
+                        <div class="flex items-center self-end sm:self-center gap-2 bg-zinc-950 border border-zinc-800 rounded-lg px-2.5 py-1.5 focus-within:ring-1 focus-within:ring-zinc-600 transition-all">
+                            <input 
+                                type="number" 
+                                class="grade-input w-12 bg-transparent text-center text-sm font-black text-zinc-100 outline-none" 
+                                placeholder="0" 
+                                inputmode="numeric"
+                                min="0" 
+                                max="${course.maxGrade}"
+                                value="${value}"
+                                data-sem-idx="${semIdx}"
+                                data-course-idx="${courseIdx}"
+                                data-credits="${course.credits}"
+                                data-max="${course.maxGrade}"
+                                oninput="app.handleInput(this)"
+                            >
+                            <span class="text-[9px] font-bold text-zinc-700 select-none">/ ${course.maxGrade}</span>
+                        </div>
+                    </div>
+                `;
+        }
+
+        toggleSemester(headerBtn) {
+          const card = headerBtn.closest(".semester-card");
+          const content = headerBtn.nextElementSibling;
+          const isCurrentlyCollapsed = content.classList.contains("collapsed");
+
+          // Accordion behavior: Close all others if we are opening this one
+          if (isCurrentlyCollapsed) {
+            document.querySelectorAll(".semester-content").forEach((el) => {
+              el.classList.add("collapsed");
+              el.previousElementSibling.classList.add("collapsed");
+              el.closest(".semester-card").classList.add("is-collapsed");
+            });
+          }
+
+          // Toggle this one
+          const willBeCollapsed = !isCurrentlyCollapsed;
+          content.classList.toggle("collapsed", willBeCollapsed);
+          headerBtn.classList.toggle("collapsed", willBeCollapsed);
+          card.classList.toggle("is-collapsed", willBeCollapsed);
+
+          // Update Expand All button state
+          this.updateToggleAllButton();
+        }
+
+        toggleAll() {
+          this.isAllExpanded = !this.isAllExpanded;
+          const contents = document.querySelectorAll(".semester-content");
+          const headers = document.querySelectorAll(".semester-header");
+          const cards = document.querySelectorAll(".semester-card");
+
+          contents.forEach((el, i) => {
+            el.classList.toggle("collapsed", !this.isAllExpanded);
+            headers[i].classList.toggle("collapsed", !this.isAllExpanded);
+            cards[i].classList.toggle("is-collapsed", !this.isAllExpanded);
+          });
+
+          this.updateToggleAllButton();
+        }
+
+        updateToggleAllButton() {
+          const allCollapsed = Array.from(
+            document.querySelectorAll(".semester-content")
+          ).every((el) => el.classList.contains("collapsed"));
+          this.isAllExpanded = !allCollapsed;
+          document.getElementById("toggle-all").textContent = this.isAllExpanded
+            ? "Collapse All"
+            : "Expand All";
+        }
+
+        resetGrades() {
+          if (!confirm("Wipe all academic data?")) return;
+          localStorage.removeItem("gpa-grades-hnu");
+          document
+            .querySelectorAll(".grade-input")
+            .forEach((input) => (input.value = ""));
+          this.calculateCGPA(true);
+        }
+
+        handleInput(input) {
+          let val = parseFloat(input.value);
+          const max = parseFloat(input.dataset.max);
+          if (val > max) input.value = max;
+          if (val < 0) input.value = 0;
+
+          clearTimeout(this.inputTimeout);
+          this.inputTimeout = setTimeout(() => {
+            this.saveGrades();
+            this.calculateCGPA(true);
+          }, 200);
+        }
+
+        animateValue(obj, start, end, duration) {
+          let startTimestamp = null;
+          const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min(
+              (timestamp - startTimestamp) / duration,
+              1
+            );
+            const val = (progress * (end - start) + start).toFixed(2);
+            obj.innerHTML = val;
+            if (progress < 1) {
+              window.requestAnimationFrame(step);
+            }
+          };
+          window.requestAnimationFrame(step);
+        }
+
+        calculateCGPA(animate = true) {
+          let totalPoints = 0,
+            totalCredits = 0;
+          const semesterCards = document.querySelectorAll(".semester-card");
+
+          semesterCards.forEach((card, idx) => {
+            let semPoints = 0,
+              semCredits = 0;
+            card.querySelectorAll(".grade-input").forEach((input) => {
+              const val = parseFloat(input.value),
+                max = parseFloat(input.dataset.max),
+                cr = parseFloat(input.dataset.credits);
+              if (!isNaN(val)) {
+                semPoints += (val / max) * 4.0 * cr;
+                semCredits += cr;
+              }
+            });
+
+            const badge = card.querySelector(".semester-gpa-badge");
+            if (semCredits > 0) {
+              const gpa = semPoints / semCredits;
+              badge.textContent = gpa.toFixed(2);
+              this.applyColor(badge, gpa, true);
+            } else {
+              badge.textContent = "-";
+              badge.className =
+                "semester-gpa-badge text-[10px] font-black px-2.5 py-1 rounded-full bg-zinc-800 text-zinc-400 min-w-[3rem] text-center border border-zinc-700/50 flex-shrink-0";
+            }
+            totalPoints += semPoints;
+            totalCredits += semCredits;
+          });
+
+          const display = document.getElementById("cgpa-display");
+          const newCGPA = totalCredits > 0 ? totalPoints / totalCredits : 0;
+
+          if (animate) {
+            this.animateValue(display, this.currentCGPA, newCGPA, 400);
+          } else {
+            display.textContent = newCGPA.toFixed(2);
+          }
+
+          this.currentCGPA = newCGPA;
+
+          if (totalCredits > 0) {
+            this.applyColor(display, newCGPA, false);
+          } else {
+            display.className =
+              "text-2xl font-black text-zinc-100 tabular-nums leading-tight";
+          }
+        }
+
+        applyColor(el, gpa, isBg) {
+          el.classList.remove(
+            "text-excellent",
+            "text-good",
+            "text-average",
+            "text-poor",
+            "bg-excellent",
+            "bg-good",
+            "bg-average",
+            "bg-poor",
+            "text-zinc-100",
+            "text-zinc-400",
+            "bg-zinc-800"
+          );
+          let type =
+            gpa >= 3.5
+              ? "excellent"
+              : gpa >= 3.0
+              ? "good"
+              : gpa >= 2.0
+              ? "average"
+              : "poor";
+          el.classList.add(isBg ? `bg-${type}` : `text-${type}`);
+        }
+
+        saveGrades() {
+          const grades = Array.from({ length: 9 }, () => []);
+          document.querySelectorAll(".grade-input").forEach((input) => {
+            const sIdx = parseInt(input.dataset.semIdx);
+            const cIdx = parseInt(input.dataset.courseIdx);
+            grades[sIdx][cIdx] = input.value;
+          });
+          localStorage.setItem("gpa-grades-hnu", JSON.stringify(grades));
+        }
+
+        loadGradesFromStorage() {
+          try {
+            return JSON.parse(localStorage.getItem("gpa-grades-hnu"));
+          } catch {
+            return null;
+          }
+        }
+
+        attachGlobalListeners() {
+          document
+            .getElementById("toggle-all")
+            .addEventListener("click", () => this.toggleAll());
+          document
+            .getElementById("reset-grades")
+            .addEventListener("click", () => this.resetGrades());
+        }
+      }
+
+      const app = new GPACalculator();
+    </script>
+  </body>
 </html>
