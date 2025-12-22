@@ -16,11 +16,10 @@
         color: #fafafa;
         -webkit-tap-highlight-color: transparent;
       }
-
       .semester-content {
         transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
           opacity 0.2s ease-in;
-        max-height: 2000px;
+        max-height: 3000px;
         opacity: 1;
         overflow: hidden;
       }
@@ -29,14 +28,12 @@
         opacity: 0;
         pointer-events: none;
       }
-
       .chevron {
         transition: transform 0.3s ease;
       }
       .collapsed .chevron {
         transform: rotate(-90deg);
       }
-
       input::-webkit-outer-spin-button,
       input::-webkit-inner-spin-button {
         -webkit-appearance: none;
@@ -45,37 +42,38 @@
       input[type="number"] {
         -moz-appearance: textfield;
       }
-
       .text-excellent {
-        color: #4ade80;
+        color: #4ade80 !important;
       }
       .text-good {
-        color: #60a5fa;
+        color: #60a5fa !important;
       }
       .text-average {
-        color: #fbbf24;
+        color: #fbbf24 !important;
       }
       .text-poor {
-        color: #f87171;
+        color: #f87171 !important;
       }
-
       .bg-excellent {
-        background-color: #064e3b;
-        color: #4ade80;
+        background-color: #064e3b !important;
+        color: #4ade80 !important;
+        border: 1px solid #065f46 !important;
       }
       .bg-good {
-        background-color: #1e3a8a;
-        color: #93c5fd;
+        background-color: #1e3a8a !important;
+        color: #93c5fd !important;
+        border: 1px solid #1e40af !important;
       }
       .bg-average {
-        background-color: #713f12;
-        color: #fde047;
+        background-color: #713f12 !important;
+        color: #fde047 !important;
+        border: 1px solid #854d0e !important;
       }
       .bg-poor {
-        background-color: #7f1d1d;
-        color: #fca5a5;
+        background-color: #7f1d1d !important;
+        color: #fca5a5 !important;
+        border: 1px solid #991b1b !important;
       }
-
       .semester-card {
         transition: border-color 0.3s ease, background-color 0.3s ease;
       }
@@ -83,7 +81,24 @@
         border-color: #27272a;
         background-color: #0c0c0e;
       }
-
+      @keyframes pulse-highlight-red {
+        0% {
+          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6);
+          background-color: #2d0a0a;
+        }
+        50% {
+          box-shadow: 0 0 0 15px rgba(239, 68, 68, 0);
+          background-color: #ef444422;
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+          background-color: transparent;
+        }
+      }
+      .highlight-course {
+        animation: pulse-highlight-red 1.8s ease-out;
+        border-radius: 8px;
+      }
       #import-modal {
         backdrop-filter: blur(8px);
       }
@@ -101,10 +116,9 @@
           <p
             class="text-[9px] text-zinc-500 uppercase tracking-widest font-medium truncate"
           >
-            Medical Laboratory
+            Medical Laboratory Program
           </p>
         </div>
-
         <div class="text-right flex-shrink-0">
           <div
             class="text-[9px] uppercase tracking-wider text-zinc-500 font-bold"
@@ -120,39 +134,29 @@
         </div>
       </div>
     </header>
-
     <main class="flex-1 container mx-auto max-w-xl px-3 py-6">
-      <div class="flex justify-between items-center mb-4 px-1">
-        <h2
-          class="text-[10px] font-bold text-zinc-500 uppercase tracking-widest"
+      <div class="flex justify-center items-center gap-2 mb-8">
+        <button
+          onclick="app.openImportModal()"
+          class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold uppercase tracking-wider py-2 px-4 rounded-md transition active:scale-95 shadow-lg shadow-blue-900/20"
         >
-          Academic Records
-        </h2>
-        <div class="flex gap-1.5">
-          <button
-            onclick="app.openImportModal()"
-            class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold uppercase tracking-wider py-1.5 px-3 rounded-md transition active:scale-95 shadow-lg shadow-blue-900/20"
-          >
-            Smart Import
-          </button>
-          <button
-            id="toggle-all"
-            class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[10px] font-bold uppercase tracking-wider py-1.5 px-3 rounded-md border border-zinc-700 transition active:scale-95"
-          >
-            Expand
-          </button>
-          <button
-            id="reset-grades"
-            class="bg-zinc-900 hover:bg-red-950/30 text-red-500 text-[10px] font-bold uppercase tracking-wider py-1.5 px-3 rounded-md border border-red-900/30 transition active:scale-95"
-          >
-            Reset
-          </button>
-        </div>
+          Smart Import
+        </button>
+        <button
+          id="toggle-all"
+          class="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[10px] font-bold uppercase tracking-wider py-2 px-4 rounded-md border border-zinc-700 transition active:scale-95"
+        >
+          Expand All
+        </button>
+        <button
+          id="reset-grades"
+          class="bg-zinc-900 hover:bg-red-950/30 text-red-500 text-[10px] font-bold uppercase tracking-wider py-2 px-4 rounded-md border border-red-900/30 transition active:scale-95"
+        >
+          Reset
+        </button>
       </div>
-
       <div id="semesters-container" class="space-y-3"></div>
     </main>
-
     <div
       id="import-modal"
       class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/60"
@@ -163,15 +167,13 @@
         <div class="p-6">
           <h3 class="text-lg font-bold text-zinc-100 mb-2">Portal Import</h3>
           <p class="text-sm text-zinc-400 mb-4">
-            Go to <b>Final Grades</b> on the HNU portal, copy all text, and
-            paste it here.
+            Paste text from HNU portal grades page.
           </p>
           <textarea
             id="import-area"
             class="w-full h-48 bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-xs text-zinc-300 font-mono focus:ring-1 focus:ring-blue-500 outline-none resize-none"
-            placeholder="Paste portal text here..."
+            placeholder="Paste here..."
           ></textarea>
-
           <div class="flex gap-3 mt-6">
             <button
               onclick="app.closeImportModal()"
@@ -189,7 +191,6 @@
         </div>
       </div>
     </div>
-
     <footer class="border-t border-zinc-900/50 py-6">
       <div class="container mx-auto text-center px-4">
         <p
@@ -199,20 +200,29 @@
         </p>
       </div>
     </footer>
-
     <script>
       class GPACalculator {
         constructor() {
           this.currentCGPA = 0;
           this.isAllExpanded = false;
+          this.semesterConfig = {
+            1: true,
+            2: true,
+            3: true,
+            4: true,
+            5: true,
+            6: true,
+            7: true,
+            8: true,
+          };
           this.defaultSemesters = [
             {
               id: 1,
-              title: "1st Year - Sem 1",
+              title: "First Level - 1st Semester",
               courses: [
                 {
                   code: "UN101",
-                  name: "Academic Reading & Writing (1)",
+                  name: "Academic Reading and Writing (1)",
                   credits: 2,
                   maxGrade: 100,
                 },
@@ -230,7 +240,7 @@
                 },
                 {
                   code: "THS103",
-                  name: "Intro to Electrical Eng.",
+                  name: "Introduction to Electrical Engineering",
                   credits: 3,
                   maxGrade: 150,
                 },
@@ -248,7 +258,7 @@
                 },
                 {
                   code: "UN103",
-                  name: "Critical thinking",
+                  name: "Critical Thinking",
                   credits: 2,
                   maxGrade: 100,
                 },
@@ -256,23 +266,24 @@
             },
             {
               id: 2,
-              title: "1st Year - Sem 2",
+              title: "First Level - 2nd Semester",
               courses: [
                 {
                   code: "THS115",
                   name: "Electronic Circuits & Devices",
                   credits: 3,
                   maxGrade: 150,
+                  prereq: "THS103",
                 },
                 {
                   code: "THS116",
-                  name: "General Anatomy & Histology",
+                  name: "General Anatomy & Histology for Technologists",
                   credits: 3,
                   maxGrade: 150,
                 },
                 {
                   code: "THS117",
-                  name: "General Physiology",
+                  name: "General Physiology for Technologists",
                   credits: 2,
                   maxGrade: 100,
                 },
@@ -290,9 +301,10 @@
                 },
                 {
                   code: "UN114",
-                  name: "Academic Reading & Writing (2)",
+                  name: "Academic Reading and Writing (2)",
                   credits: 2,
                   maxGrade: 100,
+                  prereq: "UN101",
                 },
                 {
                   code: "THS1110",
@@ -300,75 +312,49 @@
                   credits: 1,
                   maxGrade: 50,
                 },
-                {
-                  code: "UN30",
-                  name: "Social Issues",
-                  credits: 2,
-                  maxGrade: 50,
-                },
               ],
             },
             {
               id: 3,
-              title: "Summer Courses",
-              courses: [
-                {
-                  code: "THS102",
-                  name: "Mathematics (Repeat)",
-                  credits: 2,
-                  maxGrade: 100,
-                },
-                {
-                  code: "THS104",
-                  name: "Mechanics (Repeat)",
-                  credits: 2,
-                  maxGrade: 100,
-                },
-                {
-                  code: "THS115",
-                  name: "Electronics (Repeat)",
-                  credits: 3,
-                  maxGrade: 150,
-                },
-              ],
-            },
-            {
-              id: 4,
-              title: "2nd Year - Sem 1",
+              title: "Second Level - 1st Semester",
               courses: [
                 {
                   code: "THS2010",
                   name: "Mechatronics Engineering",
                   credits: 2,
                   maxGrade: 100,
+                  prereq: "THS104",
                 },
                 {
                   code: "TL201",
-                  name: "Biochemistry",
+                  name: "Biochemistry for Technologists (1)",
                   credits: 4,
                   maxGrade: 200,
+                  prereq: "THS119",
                 },
                 {
                   code: "TL202",
-                  name: "Parasitology (1)",
+                  name: "Parasitology for Technologists (1)",
                   credits: 2,
                   maxGrade: 100,
+                  prereq: "THS118",
                 },
                 {
                   code: "TL203",
-                  name: "Bacteriology",
+                  name: "Bacteriology for Technologists",
                   credits: 4,
                   maxGrade: 200,
+                  prereq: "THS118",
                 },
                 {
                   code: "TL204",
-                  name: "Histology for Lab",
+                  name: "Histology for Laboratory for Technologists",
                   credits: 2,
                   maxGrade: 100,
                 },
                 {
                   code: "UN5",
-                  name: "Digital Technology Foundation",
+                  name: "Foundation of Digital Technology",
                   credits: 2,
                   maxGrade: 100,
                 },
@@ -381,36 +367,201 @@
               ],
             },
             {
-              id: 5,
-              title: "2nd Year - Sem 2",
+              id: 4,
+              title: "Second Level - 2nd Semester",
               courses: [
                 {
                   code: "TL215",
-                  name: "Molecular Biology",
+                  name: "Molecular Biology for Technologists",
                   credits: 4,
                   maxGrade: 200,
+                  prereq: "TL201",
                 },
                 {
                   code: "TL216",
-                  name: "Hematology (1)",
+                  name: "Hematology for Technologists (1)",
                   credits: 4,
                   maxGrade: 200,
+                  prereq: "THS117",
                 },
                 {
                   code: "TL217",
                   name: "Systematic Physiology",
                   credits: 4,
                   maxGrade: 200,
+                  prereq: "THS117",
                 },
                 {
                   code: "TL218",
-                  name: "General Biology",
+                  name: "General Biology for Technologists",
                   credits: 3,
                   maxGrade: 150,
                 },
                 {
-                  code: "ETHS15",
-                  name: "Basic Life Support",
+                  code: "ETHS1",
+                  name: "Elective Faculty (1)",
+                  credits: 1,
+                  maxGrade: 50,
+                },
+              ],
+            },
+            {
+              id: 5,
+              title: "Third Level - 1st Semester",
+              courses: [
+                {
+                  code: "TL309",
+                  name: "Laboratories Instrumentation for Technologists (1)",
+                  credits: 4,
+                  maxGrade: 200,
+                },
+                {
+                  code: "TL3010",
+                  name: "Enzymology & Hormones for Technologists",
+                  credits: 4,
+                  maxGrade: 200,
+                  prereq: "TL201",
+                },
+                {
+                  code: "TL3011",
+                  name: "Parasitology for Technologists (2)",
+                  credits: 3,
+                  maxGrade: 150,
+                  prereq: "TL202",
+                },
+                {
+                  code: "TL3012",
+                  name: "Systematic Pathology for Technologists",
+                  credits: 3,
+                  maxGrade: 150,
+                  prereq: "TL217",
+                },
+                {
+                  code: "THS3011",
+                  name: "Infection Control & Occupational Safety",
+                  credits: 2,
+                  maxGrade: 100,
+                },
+                {
+                  code: "UN7",
+                  name: "Innovation and Entrepreneurship",
+                  credits: 2,
+                  maxGrade: 100,
+                },
+              ],
+            },
+            {
+              id: 6,
+              title: "Third Level - 2nd Semester",
+              courses: [
+                {
+                  code: "TL3113",
+                  name: "Biochemistry for Technologists (2)",
+                  credits: 4,
+                  maxGrade: 200,
+                  prereq: "TL201",
+                },
+                {
+                  code: "TL3114",
+                  name: "Basic Immunology",
+                  credits: 3,
+                  maxGrade: 150,
+                  prereq: "THS118",
+                },
+                {
+                  code: "TL3115",
+                  name: "Laboratory Quality Management (1)",
+                  credits: 4,
+                  maxGrade: 200,
+                },
+                {
+                  code: "TL3116",
+                  name: "Laboratory Instrumentation for Technologists (2)",
+                  credits: 4,
+                  maxGrade: 200,
+                  prereq: "TL309",
+                },
+                {
+                  code: "ETHS2",
+                  name: "Elective Faculty (2)",
+                  credits: 1,
+                  maxGrade: 50,
+                },
+              ],
+            },
+            {
+              id: 7,
+              title: "Fourth Level - 1st Semester",
+              courses: [
+                {
+                  code: "TL4017",
+                  name: "Biochemistry for Technologists (3)",
+                  credits: 3,
+                  maxGrade: 150,
+                  prereq: "TL3113",
+                },
+                {
+                  code: "TL4018",
+                  name: "Virology and Mycology for Technologists",
+                  credits: 3,
+                  maxGrade: 150,
+                  prereq: "THS118",
+                },
+                {
+                  code: "TL4019",
+                  name: "Hematology for Technologists (2)",
+                  credits: 4,
+                  maxGrade: 200,
+                  prereq: "TL216",
+                },
+                {
+                  code: "TL4020",
+                  name: "Blood Banking for Technologists",
+                  credits: 4,
+                  maxGrade: 200,
+                },
+                {
+                  code: "ETHS3",
+                  name: "Elective Faculty (3)",
+                  credits: 1,
+                  maxGrade: 50,
+                },
+              ],
+            },
+            {
+              id: 8,
+              title: "Fourth Level - 2nd Semester",
+              courses: [
+                {
+                  code: "TL4121",
+                  name: "Laboratory Immunology & Serology",
+                  credits: 4,
+                  maxGrade: 200,
+                  prereq: "TL3114",
+                },
+                {
+                  code: "TL4122",
+                  name: "Age & Pregnancy Related Investigation",
+                  credits: 4,
+                  maxGrade: 200,
+                },
+                {
+                  code: "TL4123",
+                  name: "Laboratory Quality Management (2)",
+                  credits: 4,
+                  maxGrade: 150,
+                  prereq: "TL3115",
+                },
+                {
+                  code: "TL4124",
+                  name: "Forensic Chemistry & Toxicology for Technologists",
+                  credits: 4,
+                  maxGrade: 200,
+                  prereq: "TL217",
+                },
+                {
+                  code: "ETHS4",
+                  name: "Elective Faculty (4)",
                   credits: 1,
                   maxGrade: 50,
                 },
@@ -429,71 +580,53 @@
         renderSemesters() {
           const container = document.getElementById("semesters-container");
           container.innerHTML = "";
-          const storedGrades = this.loadGradesFromStorage() || [];
-
-          this.defaultSemesters.forEach((semester, index) => {
+          const storedGrades = this.loadGradesFromStorage() || {};
+          this.defaultSemesters.forEach((semester) => {
+            if (!this.semesterConfig[semester.id]) return;
             const semesterDiv = document.createElement("div");
             semesterDiv.className =
-              "semester-card bg-zinc-900 rounded-lg border border-zinc-800 overflow-hidden is-collapsed";
-            semesterDiv.innerHTML = `
-                        <button class="semester-header w-full flex justify-between items-center p-4 hover:bg-zinc-800/40 transition-colors text-left collapsed" onclick="app.toggleSemester(this)">
-                            <div class="flex items-center gap-3 overflow-hidden mr-2">
-                                <span class="chevron text-zinc-600 text-[9px] flex-shrink-0">▼</span>
-                                <h3 class="font-bold text-zinc-100 text-[13px] tracking-tight truncate">${
-                                  semester.title
-                                }</h3>
-                            </div>
-                            <div class="semester-gpa-badge text-[10px] font-black px-2.5 py-1 rounded-full bg-zinc-800 text-zinc-400 min-w-[3rem] text-center border border-zinc-700/50 flex-shrink-0">
-                                -
-                            </div>
-                        </button>
-                        <div class="semester-content collapsed">
-                            <div class="px-4 pb-4 pt-0 space-y-1 border-t border-zinc-800/50 mt-1">
-                                ${semester.courses
-                                  .map((course, courseIdx) => {
-                                    const savedVal =
-                                      storedGrades[index]?.[courseIdx] || "";
-                                    return this.renderCourseRow(
-                                      course,
-                                      index,
-                                      courseIdx,
-                                      savedVal
-                                    );
-                                  })
-                                  .join("")}
-                            </div>
-                        </div>
-                    `;
+              "semester-card bg-zinc-900 rounded-lg border border-zinc-800 overflow-hidden is-collapsed mb-3";
+            semesterDiv.innerHTML = `<button class="semester-header w-full flex justify-between items-center p-4 hover:bg-zinc-800/40 transition-colors text-left collapsed" onclick="app.toggleSemester(this)"><div class="flex items-center gap-3 overflow-hidden mr-2"><span class="chevron text-zinc-600 text-[9px] flex-shrink-0">▼</span><h3 class="font-bold text-zinc-100 text-[13px] tracking-tight truncate">${
+              semester.title
+            }</h3></div><div class="semester-gpa-badge text-[10px] font-black px-2.5 py-1 rounded-full bg-zinc-800 text-zinc-400 min-w-[3rem] text-center border border-zinc-700/50 flex-shrink-0">-</div></button><div class="semester-content collapsed"><div class="px-4 pb-4 pt-0 space-y-1 border-t border-zinc-800/50 mt-1">${semester.courses
+              .map((course, courseIdx) => {
+                const savedVal = storedGrades[semester.id]?.[courseIdx] || "";
+                return this.renderCourseRow(
+                  course,
+                  semester.id,
+                  courseIdx,
+                  savedVal
+                );
+              })
+              .join("")}</div></div>`;
             container.appendChild(semesterDiv);
           });
         }
 
-        renderCourseRow(course, semIdx, courseIdx, value) {
-          return `
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-3 border-b border-zinc-800/40 last:border-0">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex flex-wrap items-center gap-1.5 mb-0.5">
-                                <span class="font-bold text-zinc-200 text-xs uppercase tracking-tight">${course.name}</span>
-                                <span class="text-[8px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500 font-bold border border-zinc-700/30 whitespace-nowrap">${course.credits} CR</span>
-                            </div>
-                            <div class="text-[9px] text-zinc-600 font-bold tracking-wider uppercase">${course.code}</div>
-                        </div>
-                        <div class="flex items-center self-end sm:self-center gap-2 bg-zinc-950 border border-zinc-800 rounded-lg px-2.5 py-1.5 focus-within:ring-1 focus-within:ring-zinc-600">
-                            <input 
-                                type="number" 
-                                class="grade-input w-14 bg-transparent text-center text-sm font-black text-zinc-100 outline-none" 
-                                placeholder="0" 
-                                data-code="${course.code}"
-                                data-sem-idx="${semIdx}"
-                                data-course-idx="${courseIdx}"
-                                data-max="${course.maxGrade}"
-                                value="${value}"
-                                oninput="app.handleInput(this)"
-                            >
-                            <span class="text-[9px] font-bold text-zinc-700 select-none">/ ${course.maxGrade}</span>
-                        </div>
-                    </div>
-                `;
+        renderCourseRow(course, semId, courseIdx, value) {
+          const prereqHtml = course.prereq
+            ? `<button onclick="app.goToPrereq('${course.prereq}')" class="text-[8px] px-1.5 py-0.5 rounded bg-red-950/50 text-red-400 border border-red-900/40 hover:bg-red-800/60 transition uppercase font-black">${course.prereq}</button>`
+            : "";
+          return `<div id="course-${course.code}" class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-3 border-b border-zinc-800/40 last:border-0 transition-all duration-500"><div class="flex-1 min-w-0"><div class="flex flex-wrap items-center gap-1.5 mb-0.5"><span class="font-bold text-zinc-200 text-xs uppercase tracking-tight">${course.name}</span><span id="cr-${course.code}" class="text-[8px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500 font-bold border border-zinc-700/30 whitespace-nowrap">${course.credits} CR</span>${prereqHtml}</div><div class="text-[9px] text-zinc-600 font-bold tracking-wider uppercase">${course.code}</div></div><div class="flex items-center self-end sm:self-center gap-2 bg-zinc-950 border border-zinc-800 rounded-lg px-2.5 py-1.5 focus-within:ring-1 focus-within:ring-zinc-600"><input type="number" class="grade-input w-14 bg-transparent text-center text-sm font-black text-zinc-100 outline-none" placeholder="0" data-code="${course.code}" data-sem-id="${semId}" data-course-idx="${courseIdx}" data-max="${course.maxGrade}" value="${value}" oninput="app.handleInput(this)"><span class="text-[9px] font-bold text-zinc-700 select-none">/ ${course.maxGrade}</span></div></div>`;
+        }
+
+        goToPrereq(targetCode) {
+          const targetElement = document.getElementById(`course-${targetCode}`);
+          if (!targetElement) return;
+          const card = targetElement.closest(".semester-card");
+          const header = card.querySelector(".semester-header");
+          this.toggleSemester(header);
+          setTimeout(() => {
+            targetElement.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            });
+            targetElement.classList.add("highlight-course");
+            setTimeout(
+              () => targetElement.classList.remove("highlight-course"),
+              2000
+            );
+          }, 300);
         }
 
         openImportModal() {
@@ -508,95 +641,72 @@
         processImport() {
           const text = document.getElementById("import-area").value;
           if (!text.trim()) return;
-
           const inputs = document.querySelectorAll(".grade-input");
-          let foundCount = 0;
-
           inputs.forEach((input) => {
-            const code = input.dataset.code;
             const regex = new RegExp(
-              code + "[^]*?(\\d+(?:\\.\\d+)?)\\s*\\/",
+              input.dataset.code + "[^]*?(\\d+(?:\\.\\d+)?)\\s*\\/",
               "i"
             );
             const match = text.match(regex);
-
-            if (match && match[1]) {
-              input.value = match[1];
-              foundCount++;
-            }
+            if (match && match[1]) input.value = match[1];
           });
-
           this.saveGrades();
           this.calculateCGPA(true);
           this.closeImportModal();
-
-          if (foundCount > 0) {
-            this.renderSemesters();
-            this.calculateCGPA(false);
-          } else {
-            alert("Could not extract any grades.");
-          }
+          this.renderSemesters();
         }
 
-        /**
-         * Accordion Logic: Toggles target and collapses all others
-         */
         toggleSemester(headerBtn) {
           const card = headerBtn.closest(".semester-card");
           const content = headerBtn.nextElementSibling;
           const isExpanding = content.classList.contains("collapsed");
-
-          // If we are expanding this semester, collapse all others first
           if (isExpanding) {
             document.querySelectorAll(".semester-card").forEach((otherCard) => {
               if (otherCard !== card) {
-                const otherHeader = otherCard.querySelector(".semester-header");
-                const otherContent =
-                  otherCard.querySelector(".semester-content");
-
-                otherHeader.classList.add("collapsed");
-                otherContent.classList.add("collapsed");
+                otherCard
+                  .querySelector(".semester-content")
+                  .classList.add("collapsed");
+                otherCard
+                  .querySelector(".semester-header")
+                  .classList.add("collapsed");
                 otherCard.classList.add("is-collapsed");
               }
             });
           }
-
-          // Toggle the clicked one
           content.classList.toggle("collapsed");
           headerBtn.classList.toggle("collapsed");
           card.classList.toggle("is-collapsed");
-
           this.updateToggleAllButton();
         }
 
-        /**
-         * Bulk expand/collapse
-         */
         toggleAll() {
-          this.isAllExpanded = !this.isAllExpanded;
+          const someCollapsed = Array.from(
+            document.querySelectorAll(".semester-content")
+          ).some((el) => el.classList.contains("collapsed"));
+          this.isAllExpanded = someCollapsed;
           document.querySelectorAll(".semester-card").forEach((card) => {
-            const header = card.querySelector(".semester-header");
-            const content = card.querySelector(".semester-content");
-
-            content.classList.toggle("collapsed", !this.isAllExpanded);
-            header.classList.toggle("collapsed", !this.isAllExpanded);
+            card
+              .querySelector(".semester-content")
+              .classList.toggle("collapsed", !this.isAllExpanded);
+            card
+              .querySelector(".semester-header")
+              .classList.toggle("collapsed", !this.isAllExpanded);
             card.classList.toggle("is-collapsed", !this.isAllExpanded);
           });
           this.updateToggleAllButton();
         }
 
         updateToggleAllButton() {
-          const someExpanded = Array.from(
+          const someOpen = Array.from(
             document.querySelectorAll(".semester-content")
           ).some((el) => !el.classList.contains("collapsed"));
-          this.isAllExpanded = someExpanded;
-          document.getElementById("toggle-all").textContent = this.isAllExpanded
-            ? "Collapse"
-            : "Expand";
+          document.getElementById("toggle-all").textContent = someOpen
+            ? "Collapse All"
+            : "Expand All";
         }
 
         resetGrades() {
-          if (!confirm("Wipe all data?")) return;
+          if (!confirm("Reset all grades?")) return;
           localStorage.removeItem("gpa-grades-hnu");
           document
             .querySelectorAll(".grade-input")
@@ -609,7 +719,6 @@
           const max = parseFloat(input.dataset.max);
           if (val > max) input.value = max;
           if (val < 0) input.value = 0;
-
           clearTimeout(this.inputTimeout);
           this.inputTimeout = setTimeout(() => {
             this.saveGrades();
@@ -620,20 +729,20 @@
         calculateCGPA(animate = true) {
           let totalPoints = 0,
             totalCredits = 0;
-          const semesters = this.defaultSemesters;
-
-          document.querySelectorAll(".semester-card").forEach((card, idx) => {
+          document.querySelectorAll(".semester-card").forEach((card) => {
             let semPoints = 0,
               semCredits = 0;
-            card.querySelectorAll(".grade-input").forEach((input, cIdx) => {
+            card.querySelectorAll(".grade-input").forEach((input) => {
               const val = parseFloat(input.value);
-              const course = semesters[idx].courses[cIdx];
-              if (!isNaN(val)) {
-                semPoints += (val / course.maxGrade) * 4.0 * course.credits;
-                semCredits += course.credits;
+              const max = parseFloat(input.dataset.max);
+              const code = input.dataset.code;
+              const crEl = document.getElementById(`cr-${code}`);
+              if (crEl && !isNaN(val)) {
+                const cr = parseFloat(crEl.textContent);
+                semPoints += (val / max) * 4.0 * cr;
+                semCredits += cr;
               }
             });
-
             const badge = card.querySelector(".semester-gpa-badge");
             if (semCredits > 0) {
               const gpa = semPoints / semCredits;
@@ -647,23 +756,13 @@
             totalPoints += semPoints;
             totalCredits += semCredits;
           });
-
           const display = document.getElementById("cgpa-display");
           const newCGPA = totalCredits > 0 ? totalPoints / totalCredits : 0;
-
-          if (animate) {
+          if (animate)
             this.animateValue(display, this.currentCGPA, newCGPA, 400);
-          } else {
-            display.textContent = newCGPA.toFixed(2);
-          }
+          else display.textContent = newCGPA.toFixed(2);
           this.currentCGPA = newCGPA;
-
-          if (totalCredits > 0) {
-            this.applyColor(display, newCGPA, false);
-          } else {
-            display.className =
-              "text-2xl font-black text-zinc-100 tabular-nums leading-tight";
-          }
+          this.applyColor(display, newCGPA, false);
         }
 
         animateValue(obj, start, end, duration) {
@@ -674,7 +773,9 @@
               (timestamp - startTimestamp) / duration,
               1
             );
-            obj.innerHTML = (progress * (end - start) + start).toFixed(2);
+            const current = progress * (end - start) + start;
+            obj.innerHTML = current.toFixed(2);
+            this.applyColor(obj, current, false);
             if (progress < 1) window.requestAnimationFrame(step);
           };
           window.requestAnimationFrame(step);
@@ -689,11 +790,9 @@
             "bg-excellent",
             "bg-good",
             "bg-average",
-            "bg-poor",
-            "text-zinc-100",
-            "text-zinc-400",
-            "bg-zinc-800"
+            "bg-poor"
           );
+          if (!gpa || gpa === 0) return;
           let type =
             gpa >= 3.4
               ? "excellent"
@@ -706,12 +805,11 @@
         }
 
         saveGrades() {
-          const grades = Array.from(
-            { length: this.defaultSemesters.length },
-            () => []
-          );
+          const grades = {};
           document.querySelectorAll(".grade-input").forEach((input) => {
-            grades[input.dataset.semIdx][input.dataset.courseIdx] = input.value;
+            const sid = input.dataset.semId;
+            if (!grades[sid]) grades[sid] = [];
+            grades[sid][input.dataset.courseIdx] = input.value;
           });
           localStorage.setItem("gpa-grades-hnu", JSON.stringify(grades));
         }
@@ -720,7 +818,7 @@
           try {
             return JSON.parse(localStorage.getItem("gpa-grades-hnu"));
           } catch {
-            return null;
+            return {};
           }
         }
 
