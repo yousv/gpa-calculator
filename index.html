@@ -651,9 +651,9 @@
             if (match && match[1]) input.value = match[1];
           });
           this.saveGrades();
-          this.calculateCGPA(true);
           this.closeImportModal();
           this.renderSemesters();
+          this.calculateCGPA(true);
         }
 
         toggleSemester(headerBtn) {
@@ -836,4 +836,3 @@
     </script>
   </body>
 </html>
-
